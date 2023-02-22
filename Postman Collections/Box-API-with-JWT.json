@@ -1,0 +1,1166 @@
+{
+	"info": {
+		"_postman_id": "2075655c-1347-425d-bd5a-cb65b46c9992",
+		"name": "Box API with JWT",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "INIT: Load crypto library for RS512",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b96fbc6c-da08-4433-a515-c071eca2090c",
+						"type": "text/javascript",
+						"exec": [
+							"postman.setGlobalVariable(\"jsrsasign_js\", responseBody);"
+						]
+					}
+				}
+			],
+			"_postman_id": "67a37f14-a9ae-4b62-9b29-56011963ec2d",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://kjur.github.io/jsrsasign/jsrsasign-latest-all-min.js",
+				"description": "Load the RSA-Sign Crypto LIbrary in a global environment variable\n\nSource: http://kjur.github.io/jsrsasign/jsrsasign-latest-all-min.js\n\nGithub: https://github.com/kjur/jsrsasign"
+			},
+			"response": []
+		},
+		{
+			"name": "Request access token (JWT)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ad12bab7-e342-4dfd-bc4c-48c21dff85b7",
+						"exec": [
+							"let jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"const newExpiresAt = Date.now() + jsonData.expires_in * 1000\r",
+							"\r",
+							"// Store the new variables in the environment\r",
+							"postman.setGlobalVariable(\"jwt_access_token\", jsonData.access_token);\r",
+							"postman.setGlobalVariable(\"jwt_expires_at\", newExpiresAt);\r",
+							"\r",
+							"// (Optional) Clear the env variables as we don't need those after fetching the token\r",
+							"postman.clearGlobalVariable(\"jwt_assertion\");\r",
+							"postman.clearGlobalVariable(\"jwt_client_id\");\r",
+							"postman.clearGlobalVariable(\"jwt_client_secret\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d4e36a11-7491-44c6-942c-f2adc53851f9",
+						"exec": [
+							"// Load the jsrsasign library into Postman Sandbox\r",
+							"const navigator = {};   //fake a navigator object for the lib\r",
+							"const window = {};      //fake a window object for the lib\r",
+							"eval(pm.globals.get(\"jsrsasign_js\"));   //import javascript jsrsasign\r",
+							"\r",
+							"const envConfig = pm.globals.get('config_json')\r",
+							"const config = JSON.parse(envConfig);\r",
+							"\r",
+							"// Generate random string for \"jti\" claim\r",
+							"let newJti = \"\";\r",
+							"const charset = \"abcdefghijklmnopqrstuvwxyz0123456789\";\r",
+							"\r",
+							"// At Box, it must be at least 16 characters and at most 128 characters\r",
+							"// Ref: https://developer.box.com/guides/authentication/jwt/without-sdk/#3-create-jwt-assertion\r",
+							"for( let i=0; i < 16; i++ ) {\r",
+							"  newJti += charset.charAt(Math.floor(Math.random() * charset.length));\r",
+							"}\r",
+							"\r",
+							"// Create Header and Payload objects\r",
+							"const authenticationUrl = \"https://api.box.com/oauth2/token\";\r",
+							"\r",
+							"let header = {\r",
+							"  \"kid\": config.boxAppSettings.appAuth.publicKeyID,\r",
+							"  \"alg\": 'RS512'\r",
+							"};\r",
+							"\r",
+							"let payload = {\r",
+							"  iss: config.boxAppSettings.clientID,\r",
+							"  sub: config.enterpriseID,\r",
+							"  box_sub_type: \"enterprise\",\r",
+							"  aud: authenticationUrl,\r",
+							"  jti: newJti,\r",
+							"  exp: Math.floor(Date.now() / 1000) + 45\r",
+							"};\r",
+							"\r",
+							"const key = {\r",
+							"  key: config.boxAppSettings.appAuth.privateKey,\r",
+							"  passphrase: config.boxAppSettings.appAuth.passphrase\r",
+							"};\r",
+							"\r",
+							"const prvKey = KEYUTIL.getKey(key.key, key.passphrase);\r",
+							"\r",
+							"// Prep the objects for a JWT\r",
+							"const sHeader = JSON.stringify(header);\r",
+							"const sPayload = JSON.stringify(payload);\r",
+							"\r",
+							"const sJWT = KJUR.jws.JWS.sign(header.alg, sHeader, sPayload, prvKey);\r",
+							"\r",
+							"// Set as env variables (these will be cleared after the call in post-script \"Tests\" phase)\r",
+							"pm.globals.set(\"jwt_assertion\", sJWT);\r",
+							"pm.globals.set(\"jwt_client_id\", config.boxAppSettings.clientID);\r",
+							"pm.globals.set(\"jwt_client_secret\", config.boxAppSettings.clientSecret);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"_postman_id": "ad3510b8-39f4-486b-be2c-f659ddee97b3",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "grant_type",
+							"value": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+							"type": "text"
+						},
+						{
+							"key": "assertion",
+							"value": "{{jwt_assertion}}",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{jwt_client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{jwt_client_secret}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"formdata": {}
+					}
+				},
+				"url": "https://api.box.com/oauth2/token"
+			},
+			"response": []
+		},
+		{
+			"name": "Get current user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7e6a19d0-7542-4c19-b942-fbbb1639e70f",
+						"exec": [
+							"// determine if the Access Token has expired",
+							"const expiresAt = pm.globals.get('jwt_expires_at')",
+							"const accessToken = pm.globals.get('jwt_access_token')",
+							"const expired = Date.now() > Number(expiresAt)",
+							"",
+							"// If token is present and is not expired, then we immediately exit and move on to making the call",
+							"if ( accessToken && expiresAt && !expired ) {",
+							"    return",
+							"}",
+							"",
+							"// Load the jsrsasign library into Postman Sandbox",
+							"const navigator = {};   //fake a navigator object for the lib",
+							"const window = {};      //fake a window object for the lib",
+							"eval(pm.globals.get(\"jsrsasign_js\"));   //import javascript jsrsasign",
+							"",
+							"const envConfig = pm.globals.get('config_json')",
+							"const config = JSON.parse(envConfig);",
+							"",
+							"// Generate random string for \"jti\" claim",
+							"let newJti = \"\";",
+							"const charset = \"abcdefghijklmnopqrstuvwxyz0123456789\";",
+							"",
+							"// At Box, it must be at least 16 characters and at most 128 characters",
+							"// Ref: https://developer.box.com/guides/authentication/jwt/without-sdk/#3-create-jwt-assertion",
+							"for( let i=0; i < 16; i++ ) {",
+							"  newJti += charset.charAt(Math.floor(Math.random() * charset.length));",
+							"}",
+							"",
+							"// Create Header and Payload objects",
+							"const authenticationUrl = \"https://api.box.com/oauth2/token\";",
+							"",
+							"let header = {",
+							"  \"kid\": config.boxAppSettings.appAuth.publicKeyID,",
+							"  \"alg\": 'RS512'",
+							"};",
+							"",
+							"let payload = {",
+							"  iss: config.boxAppSettings.clientID,",
+							"  sub: config.enterpriseID,",
+							"  box_sub_type: \"enterprise\",",
+							"  aud: authenticationUrl,",
+							"  jti: newJti,",
+							"  exp: Math.floor(Date.now() / 1000) + 45",
+							"};",
+							"",
+							"const key = {",
+							"  key: config.boxAppSettings.appAuth.privateKey,",
+							"  passphrase: config.boxAppSettings.appAuth.passphrase",
+							"};",
+							"",
+							"const prvKey = KEYUTIL.getKey(key.key, key.passphrase);",
+							"",
+							"// Prep the objects for a JWT",
+							"const sHeader = JSON.stringify(header);",
+							"const sPayload = JSON.stringify(payload);",
+							"",
+							"const sJWT = KJUR.jws.JWS.sign(header.alg, sHeader, sPayload, prvKey);",
+							"",
+							"// determine if we have all the client credentials needed in the environment",
+							"const hasClientId = String(config.boxAppSettings.clientID).length === 32",
+							"const hasClientSecret = String(config.boxAppSettings.clientSecret).length === 32",
+							"const hasAllCredentials = hasClientId && hasClientSecret && sJWT",
+							"",
+							"// if the access token expired and auto refresh has been set, use the refresh",
+							"// token to create a new access token",
+							"if (hasAllCredentials) {",
+							"  // send a new API request to refresh the access token",
+							"  pm.sendRequest({",
+							"    url: 'https://api.box.com/oauth2/token',",
+							"    method: 'POST',",
+							"    headers: { 'Content-Type': 'Content-Type: application/x-www-form-urlencoded' },",
+							"    body: {",
+							"      mode: 'urlencoded',",
+							"      urlencoded: [",
+							"        { key: 'client_id', value: config.boxAppSettings.clientID, disabled: false },",
+							"        { key: 'client_secret', value: config.boxAppSettings.clientSecret, disabled: false },",
+							"        { key: 'assertion', value: sJWT, disabled: false },",
+							"        { key: 'grant_type', value: 'urn:ietf:params:oauth:grant-type:jwt-bearer', disabled: false }",
+							"      ]",
+							"    }",
+							"  }, function (error, response) {",
+							"    if (error || response.json().error) {",
+							"      // if an error occured, log the error and raise a message to the user.",
+							"      console.log(error)",
+							"      console.log(response.json())",
+							"      throw new Error('Could not get the access token. Check the console for more details.')",
+							"    } else {",
+							"      // otherwise, fetch the new access token and store it",
+							"      const data = response.json()",
+							"",
+							"      // determine when this token is set to expire at",
+							"      const newExpiresAt = Date.now() + data.expires_in * 1000",
+							"      // store the new variables in the environment",
+							"      pm.globals.set('jwt_access_token', data.access_token)",
+							"      pm.globals.set('jwt_expires_at', newExpiresAt)",
+							"    }",
+							"  })",
+							"} else {",
+							"  // if you are here, that means either client_id, client secret or JWT assertion is missing/incorrect.",
+							"  throw new Error('Something is wrong with the env variable \"config_json\". Please make sure you have the right configuration defined as global environment variable \"config_json\".')",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"_postman_id": "2333ec02-515e-411c-a392-6a5cfae54b75",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": {
+						"accessToken": "{{access_token}}",
+						"addTokenTo": "header",
+						"tokenType": "bearer"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.box.com/2.0/users/me",
+					"protocol": "https",
+					"host": [
+						"api",
+						"box",
+						"com"
+					],
+					"path": [
+						"2.0",
+						"users",
+						"me"
+					],
+					"query": [
+						{
+							"key": "fields",
+							"value": "id,type,name",
+							"description": "A comma-separated list of attributes to include in the\nresponse. This can be used to request fields that are\nnot normally returned in a standard response.\n\nBe aware that specifying this parameter will have the\neffect that none of the standard fields are returned in\nthe response unless explicitly specified, instead only\nfields for the mini representation are returned, additional\nto the fields requested.",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Retrieves information about the user who is currently authenticated.\n\nhttps://developer.box.com/reference/get-users-me"
+			},
+			"response": [
+				{
+					"id": "d0271a6e-8b5c-4e71-8384-b6850ea9fc86",
+					"name": "[200] Returns a single user object.",
+					"originalRequest": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": {
+								"accessToken": "{{access_token}}",
+								"addTokenTo": "header",
+								"tokenType": "bearer"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{api.box.com}}/2.0/users/me",
+							"protocol": "https",
+							"host": [
+								"{{api.box.com}}"
+							],
+							"path": [
+								"2.0",
+								"users",
+								"me"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,type,name",
+									"description": "A comma-separated list of attributes to include in the\nresponse. This can be used to request fields that are\nnot normally returned in a standard response.\n\nBe aware that specifying this parameter will have the\neffect that none of the standard fields are returned in\nthe response unless explicitly specified, instead only\nfields for the mini representation are returned, additional\nto the fields requested.",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieves information about the user who is currently authenticated.\n\nhttps://developer.box.com/reference/get-users-me"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"id\": \"11446498\",\n  \"type\": \"user\",\n  \"name\": \"Aaron Levie\",\n  \"login\": \"ceo@example.com\",\n  \"created_at\": \"2012-12-12T10:53:43-08:00\",\n  \"modified_at\": \"2012-12-12T10:53:43-08:00\",\n  \"language\": \"en\",\n  \"timezone\": \"Africa/Bujumbura\",\n  \"space_amount\": 11345156112,\n  \"space_used\": 1237009912,\n  \"max_upload_size\": 2147483648,\n  \"status\": \"active\",\n  \"job_title\": \"CEO\",\n  \"phone\": \"6509241374\",\n  \"address\": \"900 Jefferson Ave, Redwood City, CA 94063\",\n  \"avatar_url\": \"https://www.box.com/api/avatar/large/181216415\",\n  \"notification_email\": {\n    \"email\": \"notifications@example.com\",\n    \"is_confirmed\": true\n  }\n}"
+				}
+			]
+		},
+		{
+			"name": "List items in folder",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "02ac6508-47fc-499b-a787-6569043786e1",
+						"exec": [
+							"// determine if the Access Token has expired",
+							"const expiresAt = pm.globals.get('jwt_expires_at')",
+							"const accessToken = pm.globals.get('jwt_access_token')",
+							"const expired = Date.now() > Number(expiresAt)",
+							"",
+							"// If token is present and is not expired, then we immediately exit and move on to making the call",
+							"if ( accessToken && expiresAt && !expired ) {",
+							"    return",
+							"}",
+							"",
+							"// Load the jsrsasign library into Postman Sandbox",
+							"const navigator = {};   //fake a navigator object for the lib",
+							"const window = {};      //fake a window object for the lib",
+							"eval(pm.globals.get(\"jsrsasign_js\"));   //import javascript jsrsasign",
+							"",
+							"const envConfig = pm.globals.get('config_json')",
+							"const config = JSON.parse(envConfig);",
+							"",
+							"// Generate random string for \"jti\" claim",
+							"let newJti = \"\";",
+							"const charset = \"abcdefghijklmnopqrstuvwxyz0123456789\";",
+							"",
+							"// At Box, it must be at least 16 characters and at most 128 characters",
+							"// Ref: https://developer.box.com/guides/authentication/jwt/without-sdk/#3-create-jwt-assertion",
+							"for( let i=0; i < 16; i++ ) {",
+							"  newJti += charset.charAt(Math.floor(Math.random() * charset.length));",
+							"}",
+							"",
+							"// Create Header and Payload objects",
+							"const authenticationUrl = \"https://api.box.com/oauth2/token\";",
+							"",
+							"let header = {",
+							"  \"kid\": config.boxAppSettings.appAuth.publicKeyID,",
+							"  \"alg\": 'RS512'",
+							"};",
+							"",
+							"let payload = {",
+							"  iss: config.boxAppSettings.clientID,",
+							"  sub: config.enterpriseID,",
+							"  box_sub_type: \"enterprise\",",
+							"  aud: authenticationUrl,",
+							"  jti: newJti,",
+							"  exp: Math.floor(Date.now() / 1000) + 45",
+							"};",
+							"",
+							"const key = {",
+							"  key: config.boxAppSettings.appAuth.privateKey,",
+							"  passphrase: config.boxAppSettings.appAuth.passphrase",
+							"};",
+							"",
+							"const prvKey = KEYUTIL.getKey(key.key, key.passphrase);",
+							"",
+							"// Prep the objects for a JWT",
+							"const sHeader = JSON.stringify(header);",
+							"const sPayload = JSON.stringify(payload);",
+							"",
+							"const sJWT = KJUR.jws.JWS.sign(header.alg, sHeader, sPayload, prvKey);",
+							"",
+							"// determine if we have all the client credentials needed in the environment",
+							"const hasClientId = String(config.boxAppSettings.clientID).length === 32",
+							"const hasClientSecret = String(config.boxAppSettings.clientSecret).length === 32",
+							"const hasAllCredentials = hasClientId && hasClientSecret && sJWT",
+							"",
+							"// if the access token expired and auto refresh has been set, use the refresh",
+							"// token to create a new access token",
+							"if (hasAllCredentials) {",
+							"  // send a new API request to refresh the access token",
+							"  pm.sendRequest({",
+							"    url: 'https://api.box.com/oauth2/token',",
+							"    method: 'POST',",
+							"    headers: { 'Content-Type': 'Content-Type: application/x-www-form-urlencoded' },",
+							"    body: {",
+							"      mode: 'urlencoded',",
+							"      urlencoded: [",
+							"        { key: 'client_id', value: config.boxAppSettings.clientID, disabled: false },",
+							"        { key: 'client_secret', value: config.boxAppSettings.clientSecret, disabled: false },",
+							"        { key: 'assertion', value: sJWT, disabled: false },",
+							"        { key: 'grant_type', value: 'urn:ietf:params:oauth:grant-type:jwt-bearer', disabled: false }",
+							"      ]",
+							"    }",
+							"  }, function (error, response) {",
+							"    if (error || response.json().error) {",
+							"      // if an error occured, log the error and raise a message to the user.",
+							"      console.log(error)",
+							"      console.log(response.json())",
+							"      throw new Error('Could not get the access token. Check the console for more details.')",
+							"    } else {",
+							"      // otherwise, fetch the new access token and store it",
+							"      const data = response.json()",
+							"",
+							"      // determine when this token is set to expire at",
+							"      const newExpiresAt = Date.now() + data.expires_in * 1000",
+							"      // store the new variables in the environment",
+							"      pm.globals.set('jwt_access_token', data.access_token)",
+							"      pm.globals.set('jwt_expires_at', newExpiresAt)",
+							"    }",
+							"  })",
+							"} else {",
+							"  // if you are here, that means either client_id, client secret or JWT assertion is missing/incorrect.",
+							"  throw new Error('Something is wrong with the env variable \"config_json\". Please make sure you have the right configuration defined as global environment variable \"config_json\".')",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"_postman_id": "ee632d13-d5c3-427f-a683-7e3878067b3a",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": {
+						"accessToken": "{{access_token}}",
+						"addTokenTo": "header",
+						"tokenType": "bearer"
+					}
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "boxapi",
+						"value": "shared_link=[link]&shared_link_password=[password]",
+						"description": "The URL, and optional password, for the shared link of this item.\n\nThis header can be used to access items that have not been\nexplicitly shared with a user.\n\nUse the format `shared_link=[link]` or if a password is required then\nuse `shared_link=[link]&shared_link_password=[password]`.\n\nThis header can be used on the file or folder shared, as well as on any files\nor folders nested within the item.",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://api.box.com/2.0/folders/:folder_id/items",
+					"protocol": "https",
+					"host": [
+						"api",
+						"box",
+						"com"
+					],
+					"path": [
+						"2.0",
+						"folders",
+						":folder_id",
+						"items"
+					],
+					"query": [
+						{
+							"key": "fields",
+							"value": "id,type,name",
+							"description": "A comma-separated list of attributes to include in the\nresponse. This can be used to request fields that are\nnot normally returned in a standard response.\n\nBe aware that specifying this parameter will have the\neffect that none of the standard fields are returned in\nthe response unless explicitly specified, instead only\nfields for the mini representation are returned, additional\nto the fields requested.\n\nAdditionally this field can be used to query any metadata\napplied to the file by specifying the `metadata` field as well\nas the scope and key of the template to retrieve, for example\n`?field=metadata.enterprise_12345.contractTemplate`.",
+							"disabled": true
+						},
+						{
+							"key": "usemarker",
+							"value": "true",
+							"description": "Specifies whether to use marker-based pagination instead of\noffset-based pagination. Only one pagination method can\nbe used at a time.\n\nBy setting this value to true, the API will return a `marker` field\nthat can be passed as a parameter to this endpoint to get the next\npage of the response.",
+							"disabled": true
+						},
+						{
+							"key": "offset",
+							"value": "1000",
+							"description": "The offset of the item at which to begin the response.",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "1000",
+							"description": "The maximum number of items to return per page.",
+							"disabled": true
+						},
+						{
+							"key": "sort",
+							"value": "id",
+							"description": "Defines the **second** attribute by which items\nare sorted.\n\nItems are always sorted by their `type` first, with\nfolders listed before files, and files listed\nbefore web links.\n\nThis parameter is not supported for marker-based pagination\non the root folder (the folder with an ID of `0`).",
+							"disabled": true
+						},
+						{
+							"key": "direction",
+							"value": "ASC",
+							"description": "The direction to sort results in. This can be either in alphabetical ascending\n(`ASC`) or descending (`DESC`) order.",
+							"disabled": true
+						}
+					],
+					"variable": [
+						{
+							"key": "folder_id",
+							"value": "0",
+							"description": "The unique identifier that represent a folder.\n\nThe ID for any folder can be determined\nby visiting this folder in the web application\nand copying the ID from the URL. For example,\nfor the URL `https://*.app.box.com/folder/123`\nthe `folder_id` is `123`.\n\nThe root folder of a Box account is\nalways represented by the ID `0`.",
+							"type": "string"
+						}
+					]
+				},
+				"description": "Retrieves a page of items in a folder. These items can be files,\n\nhttps://developer.box.com/reference/get-folders-id-items"
+			},
+			"response": [
+				{
+					"id": "193f5a6f-248e-4c55-b039-05ebe8157591",
+					"name": "[405] Returned if the `folder_id` is not in a recognized format.",
+					"originalRequest": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": {
+								"accessToken": "{{access_token}}",
+								"addTokenTo": "header",
+								"tokenType": "bearer"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "boxapi",
+								"value": "shared_link=[link]&shared_link_password=[password]",
+								"description": "The URL, and optional password, for the shared link of this item.\n\nThis header can be used to access items that have not been\nexplicitly shared with a user.\n\nUse the format `shared_link=[link]` or if a password is required then\nuse `shared_link=[link]&shared_link_password=[password]`.\n\nThis header can be used on the file or folder shared, as well as on any files\nor folders nested within the item.",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{api.box.com}}/2.0/folders/:folder_id/items",
+							"protocol": "https",
+							"host": [
+								"{{api.box.com}}"
+							],
+							"path": [
+								"2.0",
+								"folders",
+								":folder_id",
+								"items"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,type,name",
+									"description": "A comma-separated list of attributes to include in the\nresponse. This can be used to request fields that are\nnot normally returned in a standard response.\n\nBe aware that specifying this parameter will have the\neffect that none of the standard fields are returned in\nthe response unless explicitly specified, instead only\nfields for the mini representation are returned, additional\nto the fields requested.\n\nAdditionally this field can be used to query any metadata\napplied to the file by specifying the `metadata` field as well\nas the scope and key of the template to retrieve, for example\n`?field=metadata.enterprise_12345.contractTemplate`.",
+									"disabled": true
+								},
+								{
+									"key": "usemarker",
+									"value": "true",
+									"description": "Specifies whether to use marker-based pagination instead of\noffset-based pagination. Only one pagination method can\nbe used at a time.\n\nBy setting this value to true, the API will return a `marker` field\nthat can be passed as a parameter to this endpoint to get the next\npage of the response.",
+									"disabled": true
+								},
+								{
+									"key": "marker",
+									"value": "JV9IRGZmieiBasejOG9yDCRNgd2ymoZIbjsxbJMjIs3kioVii",
+									"description": "Defines the position marker at which to begin returning results. This is\nused when paginating using marker-based pagination.\n\nThis requires `usemarker` to be set to `true`.",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "1000",
+									"description": "The offset of the item at which to begin the response.",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1000",
+									"description": "The maximum number of items to return per page.",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "id",
+									"description": "Defines the **second** attribute by which items\nare sorted.\n\nItems are always sorted by their `type` first, with\nfolders listed before files, and files listed\nbefore web links.\n\nThis parameter is not supported for marker-based pagination\non the root folder (the folder with an ID of `0`).",
+									"disabled": true
+								},
+								{
+									"key": "direction",
+									"value": "ASC",
+									"description": "The direction to sort results in. This can be either in alphabetical ascending\n(`ASC`) or descending (`DESC`) order.",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "folder_id",
+									"value": "12345",
+									"description": "The unique identifier that represent a folder.\n\nThe ID for any folder can be determined\nby visiting this folder in the web application\nand copying the ID from the URL. For example,\nfor the URL `https://*.app.box.com/folder/123`\nthe `folder_id` is `123`.\n\nThe root folder of a Box account is\nalways represented by the ID `0`."
+								}
+							]
+						},
+						"description": "Retrieves a page of items in a folder. These items can be files,\n\nhttps://developer.box.com/reference/get-folders-id-items"
+					},
+					"status": "Method Not Allowed",
+					"code": 405,
+					"_postman_previewlanguage": "Text",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"type\": \"error\",\n  \"status\": 400,\n  \"code\": \"item_name_invalid\",\n  \"message\": \"Method Not Allowed\",\n  \"context_info\": {\n    \"message\": \"Something went wrong.\"\n  },\n  \"help_url\": \"http://developers.box.com/docs/#errors\",\n  \"request_id\": \"abcdef123456\"\n}"
+				},
+				{
+					"id": "1ad285d6-7fc8-4029-b20d-14ad745e4a7a",
+					"name": "[404] Returned if the folder is not found, or the user does not",
+					"originalRequest": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": {
+								"accessToken": "{{access_token}}",
+								"addTokenTo": "header",
+								"tokenType": "bearer"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "boxapi",
+								"value": "shared_link=[link]&shared_link_password=[password]",
+								"description": "The URL, and optional password, for the shared link of this item.\n\nThis header can be used to access items that have not been\nexplicitly shared with a user.\n\nUse the format `shared_link=[link]` or if a password is required then\nuse `shared_link=[link]&shared_link_password=[password]`.\n\nThis header can be used on the file or folder shared, as well as on any files\nor folders nested within the item.",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{api.box.com}}/2.0/folders/:folder_id/items",
+							"protocol": "https",
+							"host": [
+								"{{api.box.com}}"
+							],
+							"path": [
+								"2.0",
+								"folders",
+								":folder_id",
+								"items"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,type,name",
+									"description": "A comma-separated list of attributes to include in the\nresponse. This can be used to request fields that are\nnot normally returned in a standard response.\n\nBe aware that specifying this parameter will have the\neffect that none of the standard fields are returned in\nthe response unless explicitly specified, instead only\nfields for the mini representation are returned, additional\nto the fields requested.\n\nAdditionally this field can be used to query any metadata\napplied to the file by specifying the `metadata` field as well\nas the scope and key of the template to retrieve, for example\n`?field=metadata.enterprise_12345.contractTemplate`.",
+									"disabled": true
+								},
+								{
+									"key": "usemarker",
+									"value": "true",
+									"description": "Specifies whether to use marker-based pagination instead of\noffset-based pagination. Only one pagination method can\nbe used at a time.\n\nBy setting this value to true, the API will return a `marker` field\nthat can be passed as a parameter to this endpoint to get the next\npage of the response.",
+									"disabled": true
+								},
+								{
+									"key": "marker",
+									"value": "JV9IRGZmieiBasejOG9yDCRNgd2ymoZIbjsxbJMjIs3kioVii",
+									"description": "Defines the position marker at which to begin returning results. This is\nused when paginating using marker-based pagination.\n\nThis requires `usemarker` to be set to `true`.",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "1000",
+									"description": "The offset of the item at which to begin the response.",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1000",
+									"description": "The maximum number of items to return per page.",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "id",
+									"description": "Defines the **second** attribute by which items\nare sorted.\n\nItems are always sorted by their `type` first, with\nfolders listed before files, and files listed\nbefore web links.\n\nThis parameter is not supported for marker-based pagination\non the root folder (the folder with an ID of `0`).",
+									"disabled": true
+								},
+								{
+									"key": "direction",
+									"value": "ASC",
+									"description": "The direction to sort results in. This can be either in alphabetical ascending\n(`ASC`) or descending (`DESC`) order.",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "folder_id",
+									"value": "12345",
+									"description": "The unique identifier that represent a folder.\n\nThe ID for any folder can be determined\nby visiting this folder in the web application\nand copying the ID from the URL. For example,\nfor the URL `https://*.app.box.com/folder/123`\nthe `folder_id` is `123`.\n\nThe root folder of a Box account is\nalways represented by the ID `0`."
+								}
+							]
+						},
+						"description": "Retrieves a page of items in a folder. These items can be files,\n\nhttps://developer.box.com/reference/get-folders-id-items"
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "Text",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"type\": \"error\",\n  \"status\": 400,\n  \"code\": \"item_name_invalid\",\n  \"message\": \"Method Not Allowed\",\n  \"context_info\": {\n    \"message\": \"Something went wrong.\"\n  },\n  \"help_url\": \"http://developers.box.com/docs/#errors\",\n  \"request_id\": \"abcdef123456\"\n}"
+				},
+				{
+					"id": "9c554797-d77d-47c3-84b8-371bb640ded3",
+					"name": "[200] Returns a collection of files, folders, and web links contained in a folder.",
+					"originalRequest": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": {
+								"accessToken": "{{access_token}}",
+								"addTokenTo": "header",
+								"tokenType": "bearer"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "boxapi",
+								"value": "shared_link=[link]&shared_link_password=[password]",
+								"description": "The URL, and optional password, for the shared link of this item.\n\nThis header can be used to access items that have not been\nexplicitly shared with a user.\n\nUse the format `shared_link=[link]` or if a password is required then\nuse `shared_link=[link]&shared_link_password=[password]`.\n\nThis header can be used on the file or folder shared, as well as on any files\nor folders nested within the item.",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{api.box.com}}/2.0/folders/:folder_id/items",
+							"protocol": "https",
+							"host": [
+								"{{api.box.com}}"
+							],
+							"path": [
+								"2.0",
+								"folders",
+								":folder_id",
+								"items"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,type,name",
+									"description": "A comma-separated list of attributes to include in the\nresponse. This can be used to request fields that are\nnot normally returned in a standard response.\n\nBe aware that specifying this parameter will have the\neffect that none of the standard fields are returned in\nthe response unless explicitly specified, instead only\nfields for the mini representation are returned, additional\nto the fields requested.\n\nAdditionally this field can be used to query any metadata\napplied to the file by specifying the `metadata` field as well\nas the scope and key of the template to retrieve, for example\n`?field=metadata.enterprise_12345.contractTemplate`.",
+									"disabled": true
+								},
+								{
+									"key": "usemarker",
+									"value": "true",
+									"description": "Specifies whether to use marker-based pagination instead of\noffset-based pagination. Only one pagination method can\nbe used at a time.\n\nBy setting this value to true, the API will return a `marker` field\nthat can be passed as a parameter to this endpoint to get the next\npage of the response.",
+									"disabled": true
+								},
+								{
+									"key": "marker",
+									"value": "JV9IRGZmieiBasejOG9yDCRNgd2ymoZIbjsxbJMjIs3kioVii",
+									"description": "Defines the position marker at which to begin returning results. This is\nused when paginating using marker-based pagination.\n\nThis requires `usemarker` to be set to `true`.",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "1000",
+									"description": "The offset of the item at which to begin the response.",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1000",
+									"description": "The maximum number of items to return per page.",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "id",
+									"description": "Defines the **second** attribute by which items\nare sorted.\n\nItems are always sorted by their `type` first, with\nfolders listed before files, and files listed\nbefore web links.\n\nThis parameter is not supported for marker-based pagination\non the root folder (the folder with an ID of `0`).",
+									"disabled": true
+								},
+								{
+									"key": "direction",
+									"value": "ASC",
+									"description": "The direction to sort results in. This can be either in alphabetical ascending\n(`ASC`) or descending (`DESC`) order.",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "folder_id",
+									"value": "12345",
+									"description": "The unique identifier that represent a folder.\n\nThe ID for any folder can be determined\nby visiting this folder in the web application\nand copying the ID from the URL. For example,\nfor the URL `https://*.app.box.com/folder/123`\nthe `folder_id` is `123`.\n\nThe root folder of a Box account is\nalways represented by the ID `0`."
+								}
+							]
+						},
+						"description": "Retrieves a page of items in a folder. These items can be files,\n\nhttps://developer.box.com/reference/get-folders-id-items"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"total_count\": 5000,\n  \"limit\": 1000,\n  \"offset\": 2000,\n  \"order\": [\n    {\n      \"by\": \"type\",\n      \"direction\": \"ASC\"\n    }\n  ],\n  \"entries\": {\n    \"id\": \"12345\",\n    \"etag\": \"1\",\n    \"type\": \"file\",\n    \"sequence_id\": \"3\",\n    \"name\": \"Contract.pdf\",\n    \"sha1\": \"85136C79CBF9FE36BB9D05D0639C70C265C18D37\",\n    \"file_version\": {\n      \"id\": \"12345\",\n      \"type\": \"file_version\",\n      \"sha1\": \"134b65991ed521fcfe4724b7d814ab8ded5185dc\"\n    }\n  }\n}"
+				},
+				{
+					"id": "aa79e475-b18e-4bf6-a86a-f7ddb6d5968d",
+					"name": "[403] Returned when the access token provided in the `Authorization` header",
+					"originalRequest": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": {
+								"accessToken": "{{access_token}}",
+								"addTokenTo": "header",
+								"tokenType": "bearer"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "boxapi",
+								"value": "shared_link=[link]&shared_link_password=[password]",
+								"description": "The URL, and optional password, for the shared link of this item.\n\nThis header can be used to access items that have not been\nexplicitly shared with a user.\n\nUse the format `shared_link=[link]` or if a password is required then\nuse `shared_link=[link]&shared_link_password=[password]`.\n\nThis header can be used on the file or folder shared, as well as on any files\nor folders nested within the item.",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{api.box.com}}/2.0/folders/:folder_id/items",
+							"protocol": "https",
+							"host": [
+								"{{api.box.com}}"
+							],
+							"path": [
+								"2.0",
+								"folders",
+								":folder_id",
+								"items"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,type,name",
+									"description": "A comma-separated list of attributes to include in the\nresponse. This can be used to request fields that are\nnot normally returned in a standard response.\n\nBe aware that specifying this parameter will have the\neffect that none of the standard fields are returned in\nthe response unless explicitly specified, instead only\nfields for the mini representation are returned, additional\nto the fields requested.\n\nAdditionally this field can be used to query any metadata\napplied to the file by specifying the `metadata` field as well\nas the scope and key of the template to retrieve, for example\n`?field=metadata.enterprise_12345.contractTemplate`.",
+									"disabled": true
+								},
+								{
+									"key": "usemarker",
+									"value": "true",
+									"description": "Specifies whether to use marker-based pagination instead of\noffset-based pagination. Only one pagination method can\nbe used at a time.\n\nBy setting this value to true, the API will return a `marker` field\nthat can be passed as a parameter to this endpoint to get the next\npage of the response.",
+									"disabled": true
+								},
+								{
+									"key": "marker",
+									"value": "JV9IRGZmieiBasejOG9yDCRNgd2ymoZIbjsxbJMjIs3kioVii",
+									"description": "Defines the position marker at which to begin returning results. This is\nused when paginating using marker-based pagination.\n\nThis requires `usemarker` to be set to `true`.",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "1000",
+									"description": "The offset of the item at which to begin the response.",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1000",
+									"description": "The maximum number of items to return per page.",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "id",
+									"description": "Defines the **second** attribute by which items\nare sorted.\n\nItems are always sorted by their `type` first, with\nfolders listed before files, and files listed\nbefore web links.\n\nThis parameter is not supported for marker-based pagination\non the root folder (the folder with an ID of `0`).",
+									"disabled": true
+								},
+								{
+									"key": "direction",
+									"value": "ASC",
+									"description": "The direction to sort results in. This can be either in alphabetical ascending\n(`ASC`) or descending (`DESC`) order.",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "folder_id",
+									"value": "12345",
+									"description": "The unique identifier that represent a folder.\n\nThe ID for any folder can be determined\nby visiting this folder in the web application\nand copying the ID from the URL. For example,\nfor the URL `https://*.app.box.com/folder/123`\nthe `folder_id` is `123`.\n\nThe root folder of a Box account is\nalways represented by the ID `0`."
+								}
+							]
+						},
+						"description": "Retrieves a page of items in a folder. These items can be files,\n\nhttps://developer.box.com/reference/get-folders-id-items"
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "Text",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"type\": \"error\",\n  \"status\": 400,\n  \"code\": \"item_name_invalid\",\n  \"message\": \"Method Not Allowed\",\n  \"context_info\": {\n    \"message\": \"Something went wrong.\"\n  },\n  \"help_url\": \"http://developers.box.com/docs/#errors\",\n  \"request_id\": \"abcdef123456\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Revoke access token",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "85e16f62-1a1e-45c1-99f1-831201188780",
+						"exec": [
+							"/*\r",
+							"// determine if the Access Token has expired\r",
+							"const accessToken = pm.globals.get('jwt_access_token')\r",
+							"const expiresAt = pm.globals.get('jwt_expires_at')\r",
+							"const expired = Date.now() > Number(expiresAt)\r",
+							"\r",
+							"// If the token is not expired, then we immediately throw the error that there is no token to revoke\r",
+							"if ( !accessToken || expired ) {\r",
+							"    throw new Error('There is no active token')\r",
+							"}\r",
+							"*/\r",
+							"\r",
+							"const envConfig = pm.globals.get('config_json')\r",
+							"const config = JSON.parse(envConfig);\r",
+							"\r",
+							"// Set as env variables (these will be cleared after the call in post-script \"Tests\" phase)\r",
+							"pm.globals.set(\"jwt_client_id\", config.boxAppSettings.clientID);\r",
+							"pm.globals.set(\"jwt_client_secret\", config.boxAppSettings.clientSecret);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "40777ec7-09b1-465c-92d6-c74d12706874",
+						"exec": [
+							"// (Optional) Clear the env variables as we don't need those after revoking the token\r",
+							"postman.clearGlobalVariable(\"jwt_client_id\");\r",
+							"postman.clearGlobalVariable(\"jwt_client_secret\");\r",
+							"postman.clearGlobalVariable(\"jwt_expires_at\");\r",
+							"postman.clearGlobalVariable(\"jwt_access_token\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"_postman_id": "58c13e75-40e5-424a-9c69-8d76bc57021a",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "{{jwt_client_id}}",
+							"description": "The Client ID of the application requesting to revoke the\naccess token."
+						},
+						{
+							"key": "client_secret",
+							"value": "{{jwt_client_secret}}",
+							"description": "The client secret of the application requesting to revoke\nan access token."
+						},
+						{
+							"key": "token",
+							"value": "{{jwt_access_token}}",
+							"description": "The access token to revoke."
+						}
+					],
+					"options": {
+						"urlencoded": {}
+					}
+				},
+				"url": "https://api.box.com/oauth2/revoke"
+			},
+			"response": [
+				{
+					"id": "11bc2c49-a668-4948-9c94-f26facfbc58d",
+					"name": "[400] An authentication error.",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"description": "The Client ID of the application requesting to revoke the\naccess token.",
+									"disabled": true
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"description": "The client secret of the application requesting to revoke\nan access token.",
+									"disabled": true
+								},
+								{
+									"key": "token",
+									"value": "n22JPxrh18m4Y0wIZPIqYZK7VRrsMTWW",
+									"description": "The access token to revoke.",
+									"disabled": true
+								}
+							]
+						},
+						"url": "https://{{api.box.com}}/oauth2/revoke",
+						"description": "Revoke an active Access Token, effectively logging a user out\n\nhttps://developer.box.com/reference/post-oauth2-revoke"
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "Text",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"error\": \"invalid_client\",\n  \"error_description\": \"The client credentials are not valid\"\n}"
+				},
+				{
+					"id": "9f762f94-9415-4b28-807a-7d4514496751",
+					"name": "[200] Returns an empty response when the token was successfully revoked.",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"description": "The Client ID of the application requesting to revoke the\naccess token.",
+									"disabled": true
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"description": "The client secret of the application requesting to revoke\nan access token.",
+									"disabled": true
+								},
+								{
+									"key": "token",
+									"value": "n22JPxrh18m4Y0wIZPIqYZK7VRrsMTWW",
+									"description": "The access token to revoke.",
+									"disabled": true
+								}
+							]
+						},
+						"url": "https://{{api.box.com}}/oauth2/revoke",
+						"description": "Revoke an active Access Token, effectively logging a user out\n\nhttps://developer.box.com/reference/post-oauth2-revoke"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"responseTime": null,
+					"body": null
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "5dc5d557-109f-4340-a22f-9c814f7ab0cc",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "adfd7735-8898-45ed-ad15-9e34f3664414",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
