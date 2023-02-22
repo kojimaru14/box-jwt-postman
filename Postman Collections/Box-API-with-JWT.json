@@ -1158,29 +1158,24 @@
 	],
 	"variable": [
 		{
-			"id": "fd780261-92d9-43cb-b9f3-478eb923e999",
+			"id": "e67c9903-d2ec-4946-b251-35de05e8e8f1",
 			"key": "config_json",
 			"value": "{\n  \"boxAppSettings\": {\n    \"clientID\": \"\",\n    \"clientSecret\": \"\",\n    \"appAuth\": {\n      \"publicKeyID\": \"\",\n      \"privateKey\": \"\",\n      \"passphrase\": \"\"\n    }\n  },\n  \"enterpriseID\": \"\"\n}",
 			"type": "string"
 		},
 		{
-			"id": "569e97a9-eb95-47dd-a87e-3e617ed17c6f",
+			"id": "64d2fe99-881e-48b8-b47b-3eb2f3557ab8",
 			"key": "jsrsasign_js",
 			"value": ""
 		},
 		{
-			"id": "0132ac16-449b-4777-809a-86369a87f17b",
-			"key": "jwt_assertion",
+			"id": "5c03b4eb-b2f8-4b08-b11e-cecf5eed6b9a",
+			"key": "jwt_access_token",
 			"value": ""
 		},
 		{
-			"id": "48d267f4-c461-4afa-b14a-9b116ca1af08",
-			"key": "jwt_client_id",
-			"value": ""
-		},
-		{
-			"id": "ce070440-0221-457d-ad4f-d8022a51ff79",
-			"key": "jwt_client_secret",
+			"id": "133c75b3-7b4c-4db5-afbd-739c4cc50671",
+			"key": "jwt_expires_at",
 			"value": ""
 		}
 	]
