@@ -366,7 +366,6 @@
 					"script": {
 						"id": "02ac6508-47fc-499b-a787-6569043786e1",
 						"exec": [
-							"// determine if the Access Token has expired",
 							"const expiresAt = pm.globals.get('jwt_expires_at')",
 							"const accessToken = pm.globals.get('jwt_access_token')",
 							"const expired = Date.now() > Number(expiresAt)",
