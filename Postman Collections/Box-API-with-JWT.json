@@ -1138,7 +1138,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "5dc5d557-109f-4340-a22f-9c814f7ab0cc",
+				"id": "39a24452-8996-487a-b05a-ed475e4b8e92",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -1148,12 +1148,20 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "adfd7735-8898-45ed-ad15-9e34f3664414",
+				"id": "ca2a9a5e-896a-4e28-b9d8-b8e04f9b0ff6",
 				"type": "text/javascript",
 				"exec": [
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"id": "e9925c80-df92-4dc3-89b8-4fbbe8c1cf45",
+			"key": "config_json",
+			"value": "{\n  \"boxAppSettings\": {\n    \"clientID\": \"\",\n    \"clientSecret\": \"\",\n    \"appAuth\": {\n      \"publicKeyID\": \"\",\n      \"privateKey\": \"\",\n      \"passphrase\": \"\"\n    }\n  },\n  \"enterpriseID\": \"\"\n}",
+			"type": "string"
 		}
 	]
 }
