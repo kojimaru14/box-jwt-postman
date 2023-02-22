@@ -966,8 +966,8 @@
 						"exec": [
 							"/*\r",
 							"// determine if the Access Token has expired\r",
-							"const accessToken = pm.globals.get('jwt_access_token')\r",
-							"const expiresAt = pm.globals.get('jwt_expires_at')\r",
+							"const accessToken = pm.collectionVariables.get('jwt_access_token')\r",
+							"const expiresAt = pm.collectionVariables.get('jwt_expires_at')\r",
 							"const expired = Date.now() > Number(expiresAt)\r",
 							"\r",
 							"// If the token is not expired, then we immediately throw the error that there is no token to revoke\r",
@@ -976,12 +976,12 @@
 							"}\r",
 							"*/\r",
 							"\r",
-							"const envConfig = pm.globals.get('config_json')\r",
+							"const envConfig = pm.collectionVariables.get('config_json')\r",
 							"const config = JSON.parse(envConfig);\r",
 							"\r",
 							"// Set as env variables (these will be cleared after the call in post-script \"Tests\" phase)\r",
-							"pm.globals.set(\"jwt_client_id\", config.boxAppSettings.clientID);\r",
-							"pm.globals.set(\"jwt_client_secret\", config.boxAppSettings.clientSecret);"
+							"pm.collectionVariables.set(\"jwt_client_id\", config.boxAppSettings.clientID);\r",
+							"pm.collectionVariables.set(\"jwt_client_secret\", config.boxAppSettings.clientSecret);"
 						],
 						"type": "text/javascript"
 					}
@@ -992,10 +992,10 @@
 						"id": "40777ec7-09b1-465c-92d6-c74d12706874",
 						"exec": [
 							"// (Optional) Clear the env variables as we don't need those after revoking the token\r",
-							"postman.clearGlobalVariable(\"jwt_client_id\");\r",
-							"postman.clearGlobalVariable(\"jwt_client_secret\");\r",
-							"postman.clearGlobalVariable(\"jwt_expires_at\");\r",
-							"postman.clearGlobalVariable(\"jwt_access_token\");"
+							"pm.collectionVariables.unset(\"jwt_client_id\");\r",
+							"pm.collectionVariables.unset(\"jwt_client_secret\");\r",
+							"pm.collectionVariables.unset(\"jwt_expires_at\");\r",
+							"pm.collectionVariables.unset(\"jwt_access_token\");"
 						],
 						"type": "text/javascript"
 					}
@@ -1158,13 +1158,13 @@
 	],
 	"variable": [
 		{
-			"id": "2a908ae0-8aa0-4c01-aff3-ce690718277a",
+			"id": "d764ed88-58d4-4a87-9431-656bbd04a51f",
 			"key": "config_json",
 			"value": "{\n  \"boxAppSettings\": {\n    \"clientID\": \"\",\n    \"clientSecret\": \"\",\n    \"appAuth\": {\n      \"publicKeyID\": \"\",\n      \"privateKey\": \"\",\n      \"passphrase\": \"\"\n    }\n  },\n  \"enterpriseID\": \"\"\n}",
 			"type": "string"
 		},
 		{
-			"id": "fc17d295-282e-4b0d-808e-43134a5d4ab9",
+			"id": "88db1a0f-7915-4128-b3eb-adfe13b06271",
 			"key": "jsrsasign_js",
 			"value": ""
 		}
