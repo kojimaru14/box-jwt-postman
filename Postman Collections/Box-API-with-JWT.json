@@ -19,7 +19,7 @@
 					}
 				}
 			],
-			"_postman_id": "67a37f14-a9ae-4b62-9b29-56011963ec2d",
+			"id": "67a37f14-a9ae-4b62-9b29-56011963ec2d",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -117,7 +117,7 @@
 					}
 				}
 			],
-			"_postman_id": "ad3510b8-39f4-486b-be2c-f659ddee97b3",
+			"id": "ad3510b8-39f4-486b-be2c-f659ddee97b3",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -150,10 +150,7 @@
 							"value": "{{jwt_client_secret}}",
 							"type": "text"
 						}
-					],
-					"options": {
-						"formdata": {}
-					}
+					]
 				},
 				"url": "https://api.box.com/oauth2/token"
 			},
@@ -273,7 +270,7 @@
 					}
 				}
 			],
-			"_postman_id": "2333ec02-515e-411c-a392-6a5cfae54b75",
+			"id": "2333ec02-515e-411c-a392-6a5cfae54b75",
 			"request": {
 				"auth": {
 					"type": "oauth2",
@@ -475,7 +472,7 @@
 					}
 				}
 			],
-			"_postman_id": "ee632d13-d5c3-427f-a683-7e3878067b3a",
+			"id": "ee632d13-d5c3-427f-a683-7e3878067b3a",
 			"request": {
 				"auth": {
 					"type": "oauth2",
@@ -550,214 +547,13 @@
 						{
 							"key": "folder_id",
 							"value": "0",
-							"description": "The unique identifier that represent a folder.\n\nThe ID for any folder can be determined\nby visiting this folder in the web application\nand copying the ID from the URL. For example,\nfor the URL `https://*.app.box.com/folder/123`\nthe `folder_id` is `123`.\n\nThe root folder of a Box account is\nalways represented by the ID `0`.",
-							"type": "string"
+							"description": "The unique identifier that represent a folder.\n\nThe ID for any folder can be determined\nby visiting this folder in the web application\nand copying the ID from the URL. For example,\nfor the URL `https://*.app.box.com/folder/123`\nthe `folder_id` is `123`.\n\nThe root folder of a Box account is\nalways represented by the ID `0`."
 						}
 					]
 				},
 				"description": "Retrieves a page of items in a folder. These items can be files,\n\nhttps://developer.box.com/reference/get-folders-id-items"
 			},
 			"response": [
-				{
-					"id": "193f5a6f-248e-4c55-b039-05ebe8157591",
-					"name": "[405] Returned if the `folder_id` is not in a recognized format.",
-					"originalRequest": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": {
-								"accessToken": "{{access_token}}",
-								"addTokenTo": "header",
-								"tokenType": "bearer"
-							}
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "boxapi",
-								"value": "shared_link=[link]&shared_link_password=[password]",
-								"description": "The URL, and optional password, for the shared link of this item.\n\nThis header can be used to access items that have not been\nexplicitly shared with a user.\n\nUse the format `shared_link=[link]` or if a password is required then\nuse `shared_link=[link]&shared_link_password=[password]`.\n\nThis header can be used on the file or folder shared, as well as on any files\nor folders nested within the item.",
-								"disabled": true
-							}
-						],
-						"url": {
-							"raw": "https://{{api.box.com}}/2.0/folders/:folder_id/items",
-							"protocol": "https",
-							"host": [
-								"{{api.box.com}}"
-							],
-							"path": [
-								"2.0",
-								"folders",
-								":folder_id",
-								"items"
-							],
-							"query": [
-								{
-									"key": "fields",
-									"value": "id,type,name",
-									"description": "A comma-separated list of attributes to include in the\nresponse. This can be used to request fields that are\nnot normally returned in a standard response.\n\nBe aware that specifying this parameter will have the\neffect that none of the standard fields are returned in\nthe response unless explicitly specified, instead only\nfields for the mini representation are returned, additional\nto the fields requested.\n\nAdditionally this field can be used to query any metadata\napplied to the file by specifying the `metadata` field as well\nas the scope and key of the template to retrieve, for example\n`?field=metadata.enterprise_12345.contractTemplate`.",
-									"disabled": true
-								},
-								{
-									"key": "usemarker",
-									"value": "true",
-									"description": "Specifies whether to use marker-based pagination instead of\noffset-based pagination. Only one pagination method can\nbe used at a time.\n\nBy setting this value to true, the API will return a `marker` field\nthat can be passed as a parameter to this endpoint to get the next\npage of the response.",
-									"disabled": true
-								},
-								{
-									"key": "marker",
-									"value": "JV9IRGZmieiBasejOG9yDCRNgd2ymoZIbjsxbJMjIs3kioVii",
-									"description": "Defines the position marker at which to begin returning results. This is\nused when paginating using marker-based pagination.\n\nThis requires `usemarker` to be set to `true`.",
-									"disabled": true
-								},
-								{
-									"key": "offset",
-									"value": "1000",
-									"description": "The offset of the item at which to begin the response.",
-									"disabled": true
-								},
-								{
-									"key": "limit",
-									"value": "1000",
-									"description": "The maximum number of items to return per page.",
-									"disabled": true
-								},
-								{
-									"key": "sort",
-									"value": "id",
-									"description": "Defines the **second** attribute by which items\nare sorted.\n\nItems are always sorted by their `type` first, with\nfolders listed before files, and files listed\nbefore web links.\n\nThis parameter is not supported for marker-based pagination\non the root folder (the folder with an ID of `0`).",
-									"disabled": true
-								},
-								{
-									"key": "direction",
-									"value": "ASC",
-									"description": "The direction to sort results in. This can be either in alphabetical ascending\n(`ASC`) or descending (`DESC`) order.",
-									"disabled": true
-								}
-							],
-							"variable": [
-								{
-									"key": "folder_id",
-									"value": "12345",
-									"description": "The unique identifier that represent a folder.\n\nThe ID for any folder can be determined\nby visiting this folder in the web application\nand copying the ID from the URL. For example,\nfor the URL `https://*.app.box.com/folder/123`\nthe `folder_id` is `123`.\n\nThe root folder of a Box account is\nalways represented by the ID `0`."
-								}
-							]
-						},
-						"description": "Retrieves a page of items in a folder. These items can be files,\n\nhttps://developer.box.com/reference/get-folders-id-items"
-					},
-					"status": "Method Not Allowed",
-					"code": 405,
-					"_postman_previewlanguage": "Text",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json"
-						}
-					],
-					"cookie": [],
-					"responseTime": null,
-					"body": "{\n  \"type\": \"error\",\n  \"status\": 400,\n  \"code\": \"item_name_invalid\",\n  \"message\": \"Method Not Allowed\",\n  \"context_info\": {\n    \"message\": \"Something went wrong.\"\n  },\n  \"help_url\": \"http://developers.box.com/docs/#errors\",\n  \"request_id\": \"abcdef123456\"\n}"
-				},
-				{
-					"id": "1ad285d6-7fc8-4029-b20d-14ad745e4a7a",
-					"name": "[404] Returned if the folder is not found, or the user does not",
-					"originalRequest": {
-						"auth": {
-							"type": "oauth2",
-							"oauth2": {
-								"accessToken": "{{access_token}}",
-								"addTokenTo": "header",
-								"tokenType": "bearer"
-							}
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "boxapi",
-								"value": "shared_link=[link]&shared_link_password=[password]",
-								"description": "The URL, and optional password, for the shared link of this item.\n\nThis header can be used to access items that have not been\nexplicitly shared with a user.\n\nUse the format `shared_link=[link]` or if a password is required then\nuse `shared_link=[link]&shared_link_password=[password]`.\n\nThis header can be used on the file or folder shared, as well as on any files\nor folders nested within the item.",
-								"disabled": true
-							}
-						],
-						"url": {
-							"raw": "https://{{api.box.com}}/2.0/folders/:folder_id/items",
-							"protocol": "https",
-							"host": [
-								"{{api.box.com}}"
-							],
-							"path": [
-								"2.0",
-								"folders",
-								":folder_id",
-								"items"
-							],
-							"query": [
-								{
-									"key": "fields",
-									"value": "id,type,name",
-									"description": "A comma-separated list of attributes to include in the\nresponse. This can be used to request fields that are\nnot normally returned in a standard response.\n\nBe aware that specifying this parameter will have the\neffect that none of the standard fields are returned in\nthe response unless explicitly specified, instead only\nfields for the mini representation are returned, additional\nto the fields requested.\n\nAdditionally this field can be used to query any metadata\napplied to the file by specifying the `metadata` field as well\nas the scope and key of the template to retrieve, for example\n`?field=metadata.enterprise_12345.contractTemplate`.",
-									"disabled": true
-								},
-								{
-									"key": "usemarker",
-									"value": "true",
-									"description": "Specifies whether to use marker-based pagination instead of\noffset-based pagination. Only one pagination method can\nbe used at a time.\n\nBy setting this value to true, the API will return a `marker` field\nthat can be passed as a parameter to this endpoint to get the next\npage of the response.",
-									"disabled": true
-								},
-								{
-									"key": "marker",
-									"value": "JV9IRGZmieiBasejOG9yDCRNgd2ymoZIbjsxbJMjIs3kioVii",
-									"description": "Defines the position marker at which to begin returning results. This is\nused when paginating using marker-based pagination.\n\nThis requires `usemarker` to be set to `true`.",
-									"disabled": true
-								},
-								{
-									"key": "offset",
-									"value": "1000",
-									"description": "The offset of the item at which to begin the response.",
-									"disabled": true
-								},
-								{
-									"key": "limit",
-									"value": "1000",
-									"description": "The maximum number of items to return per page.",
-									"disabled": true
-								},
-								{
-									"key": "sort",
-									"value": "id",
-									"description": "Defines the **second** attribute by which items\nare sorted.\n\nItems are always sorted by their `type` first, with\nfolders listed before files, and files listed\nbefore web links.\n\nThis parameter is not supported for marker-based pagination\non the root folder (the folder with an ID of `0`).",
-									"disabled": true
-								},
-								{
-									"key": "direction",
-									"value": "ASC",
-									"description": "The direction to sort results in. This can be either in alphabetical ascending\n(`ASC`) or descending (`DESC`) order.",
-									"disabled": true
-								}
-							],
-							"variable": [
-								{
-									"key": "folder_id",
-									"value": "12345",
-									"description": "The unique identifier that represent a folder.\n\nThe ID for any folder can be determined\nby visiting this folder in the web application\nand copying the ID from the URL. For example,\nfor the URL `https://*.app.box.com/folder/123`\nthe `folder_id` is `123`.\n\nThe root folder of a Box account is\nalways represented by the ID `0`."
-								}
-							]
-						},
-						"description": "Retrieves a page of items in a folder. These items can be files,\n\nhttps://developer.box.com/reference/get-folders-id-items"
-					},
-					"status": "Not Found",
-					"code": 404,
-					"_postman_previewlanguage": "Text",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json"
-						}
-					],
-					"cookie": [],
-					"responseTime": null,
-					"body": "{\n  \"type\": \"error\",\n  \"status\": 400,\n  \"code\": \"item_name_invalid\",\n  \"message\": \"Method Not Allowed\",\n  \"context_info\": {\n    \"message\": \"Something went wrong.\"\n  },\n  \"help_url\": \"http://developers.box.com/docs/#errors\",\n  \"request_id\": \"abcdef123456\"\n}"
-				},
 				{
 					"id": "9c554797-d77d-47c3-84b8-371bb640ded3",
 					"name": "[200] Returns a collection of files, folders, and web links contained in a folder.",
@@ -957,6 +753,206 @@
 					"cookie": [],
 					"responseTime": null,
 					"body": "{\n  \"type\": \"error\",\n  \"status\": 400,\n  \"code\": \"item_name_invalid\",\n  \"message\": \"Method Not Allowed\",\n  \"context_info\": {\n    \"message\": \"Something went wrong.\"\n  },\n  \"help_url\": \"http://developers.box.com/docs/#errors\",\n  \"request_id\": \"abcdef123456\"\n}"
+				},
+				{
+					"id": "1ad285d6-7fc8-4029-b20d-14ad745e4a7a",
+					"name": "[404] Returned if the folder is not found, or the user does not",
+					"originalRequest": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": {
+								"accessToken": "{{access_token}}",
+								"addTokenTo": "header",
+								"tokenType": "bearer"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "boxapi",
+								"value": "shared_link=[link]&shared_link_password=[password]",
+								"description": "The URL, and optional password, for the shared link of this item.\n\nThis header can be used to access items that have not been\nexplicitly shared with a user.\n\nUse the format `shared_link=[link]` or if a password is required then\nuse `shared_link=[link]&shared_link_password=[password]`.\n\nThis header can be used on the file or folder shared, as well as on any files\nor folders nested within the item.",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{api.box.com}}/2.0/folders/:folder_id/items",
+							"protocol": "https",
+							"host": [
+								"{{api.box.com}}"
+							],
+							"path": [
+								"2.0",
+								"folders",
+								":folder_id",
+								"items"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,type,name",
+									"description": "A comma-separated list of attributes to include in the\nresponse. This can be used to request fields that are\nnot normally returned in a standard response.\n\nBe aware that specifying this parameter will have the\neffect that none of the standard fields are returned in\nthe response unless explicitly specified, instead only\nfields for the mini representation are returned, additional\nto the fields requested.\n\nAdditionally this field can be used to query any metadata\napplied to the file by specifying the `metadata` field as well\nas the scope and key of the template to retrieve, for example\n`?field=metadata.enterprise_12345.contractTemplate`.",
+									"disabled": true
+								},
+								{
+									"key": "usemarker",
+									"value": "true",
+									"description": "Specifies whether to use marker-based pagination instead of\noffset-based pagination. Only one pagination method can\nbe used at a time.\n\nBy setting this value to true, the API will return a `marker` field\nthat can be passed as a parameter to this endpoint to get the next\npage of the response.",
+									"disabled": true
+								},
+								{
+									"key": "marker",
+									"value": "JV9IRGZmieiBasejOG9yDCRNgd2ymoZIbjsxbJMjIs3kioVii",
+									"description": "Defines the position marker at which to begin returning results. This is\nused when paginating using marker-based pagination.\n\nThis requires `usemarker` to be set to `true`.",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "1000",
+									"description": "The offset of the item at which to begin the response.",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1000",
+									"description": "The maximum number of items to return per page.",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "id",
+									"description": "Defines the **second** attribute by which items\nare sorted.\n\nItems are always sorted by their `type` first, with\nfolders listed before files, and files listed\nbefore web links.\n\nThis parameter is not supported for marker-based pagination\non the root folder (the folder with an ID of `0`).",
+									"disabled": true
+								},
+								{
+									"key": "direction",
+									"value": "ASC",
+									"description": "The direction to sort results in. This can be either in alphabetical ascending\n(`ASC`) or descending (`DESC`) order.",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "folder_id",
+									"value": "12345",
+									"description": "The unique identifier that represent a folder.\n\nThe ID for any folder can be determined\nby visiting this folder in the web application\nand copying the ID from the URL. For example,\nfor the URL `https://*.app.box.com/folder/123`\nthe `folder_id` is `123`.\n\nThe root folder of a Box account is\nalways represented by the ID `0`."
+								}
+							]
+						},
+						"description": "Retrieves a page of items in a folder. These items can be files,\n\nhttps://developer.box.com/reference/get-folders-id-items"
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "Text",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"type\": \"error\",\n  \"status\": 400,\n  \"code\": \"item_name_invalid\",\n  \"message\": \"Method Not Allowed\",\n  \"context_info\": {\n    \"message\": \"Something went wrong.\"\n  },\n  \"help_url\": \"http://developers.box.com/docs/#errors\",\n  \"request_id\": \"abcdef123456\"\n}"
+				},
+				{
+					"id": "193f5a6f-248e-4c55-b039-05ebe8157591",
+					"name": "[405] Returned if the `folder_id` is not in a recognized format.",
+					"originalRequest": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": {
+								"accessToken": "{{access_token}}",
+								"addTokenTo": "header",
+								"tokenType": "bearer"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "boxapi",
+								"value": "shared_link=[link]&shared_link_password=[password]",
+								"description": "The URL, and optional password, for the shared link of this item.\n\nThis header can be used to access items that have not been\nexplicitly shared with a user.\n\nUse the format `shared_link=[link]` or if a password is required then\nuse `shared_link=[link]&shared_link_password=[password]`.\n\nThis header can be used on the file or folder shared, as well as on any files\nor folders nested within the item.",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{api.box.com}}/2.0/folders/:folder_id/items",
+							"protocol": "https",
+							"host": [
+								"{{api.box.com}}"
+							],
+							"path": [
+								"2.0",
+								"folders",
+								":folder_id",
+								"items"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "id,type,name",
+									"description": "A comma-separated list of attributes to include in the\nresponse. This can be used to request fields that are\nnot normally returned in a standard response.\n\nBe aware that specifying this parameter will have the\neffect that none of the standard fields are returned in\nthe response unless explicitly specified, instead only\nfields for the mini representation are returned, additional\nto the fields requested.\n\nAdditionally this field can be used to query any metadata\napplied to the file by specifying the `metadata` field as well\nas the scope and key of the template to retrieve, for example\n`?field=metadata.enterprise_12345.contractTemplate`.",
+									"disabled": true
+								},
+								{
+									"key": "usemarker",
+									"value": "true",
+									"description": "Specifies whether to use marker-based pagination instead of\noffset-based pagination. Only one pagination method can\nbe used at a time.\n\nBy setting this value to true, the API will return a `marker` field\nthat can be passed as a parameter to this endpoint to get the next\npage of the response.",
+									"disabled": true
+								},
+								{
+									"key": "marker",
+									"value": "JV9IRGZmieiBasejOG9yDCRNgd2ymoZIbjsxbJMjIs3kioVii",
+									"description": "Defines the position marker at which to begin returning results. This is\nused when paginating using marker-based pagination.\n\nThis requires `usemarker` to be set to `true`.",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "1000",
+									"description": "The offset of the item at which to begin the response.",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1000",
+									"description": "The maximum number of items to return per page.",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "id",
+									"description": "Defines the **second** attribute by which items\nare sorted.\n\nItems are always sorted by their `type` first, with\nfolders listed before files, and files listed\nbefore web links.\n\nThis parameter is not supported for marker-based pagination\non the root folder (the folder with an ID of `0`).",
+									"disabled": true
+								},
+								{
+									"key": "direction",
+									"value": "ASC",
+									"description": "The direction to sort results in. This can be either in alphabetical ascending\n(`ASC`) or descending (`DESC`) order.",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "folder_id",
+									"value": "12345",
+									"description": "The unique identifier that represent a folder.\n\nThe ID for any folder can be determined\nby visiting this folder in the web application\nand copying the ID from the URL. For example,\nfor the URL `https://*.app.box.com/folder/123`\nthe `folder_id` is `123`.\n\nThe root folder of a Box account is\nalways represented by the ID `0`."
+								}
+							]
+						},
+						"description": "Retrieves a page of items in a folder. These items can be files,\n\nhttps://developer.box.com/reference/get-folders-id-items"
+					},
+					"status": "Method Not Allowed",
+					"code": 405,
+					"_postman_previewlanguage": "Text",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"type\": \"error\",\n  \"status\": 400,\n  \"code\": \"item_name_invalid\",\n  \"message\": \"Method Not Allowed\",\n  \"context_info\": {\n    \"message\": \"Something went wrong.\"\n  },\n  \"help_url\": \"http://developers.box.com/docs/#errors\",\n  \"request_id\": \"abcdef123456\"\n}"
 				}
 			]
 		},
@@ -1005,7 +1001,7 @@
 					}
 				}
 			],
-			"_postman_id": "58c13e75-40e5-424a-9c69-8d76bc57021a",
+			"id": "58c13e75-40e5-424a-9c69-8d76bc57021a",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -1035,14 +1031,56 @@
 							"value": "{{jwt_access_token}}",
 							"description": "The access token to revoke."
 						}
-					],
-					"options": {
-						"urlencoded": {}
-					}
+					]
 				},
 				"url": "https://api.box.com/oauth2/revoke"
 			},
 			"response": [
+				{
+					"id": "9f762f94-9415-4b28-807a-7d4514496751",
+					"name": "[200] Returns an empty response when the token was successfully revoked.",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"description": "The Client ID of the application requesting to revoke the\naccess token.",
+									"disabled": true
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"description": "The client secret of the application requesting to revoke\nan access token.",
+									"disabled": true
+								},
+								{
+									"key": "token",
+									"value": "n22JPxrh18m4Y0wIZPIqYZK7VRrsMTWW",
+									"description": "The access token to revoke.",
+									"disabled": true
+								}
+							]
+						},
+						"url": "https://{{api.box.com}}/oauth2/revoke",
+						"description": "Revoke an active Access Token, effectively logging a user out\n\nhttps://developer.box.com/reference/post-oauth2-revoke"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "Text",
+					"header": [],
+					"cookie": [],
+					"responseTime": null,
+					"body": null
+				},
 				{
 					"id": "11bc2c49-a668-4948-9c94-f26facfbc58d",
 					"name": "[400] An authentication error.",
@@ -1092,51 +1130,6 @@
 					"cookie": [],
 					"responseTime": null,
 					"body": "{\n  \"error\": \"invalid_client\",\n  \"error_description\": \"The client credentials are not valid\"\n}"
-				},
-				{
-					"id": "9f762f94-9415-4b28-807a-7d4514496751",
-					"name": "[200] Returns an empty response when the token was successfully revoked.",
-					"originalRequest": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/x-www-form-urlencoded"
-							}
-						],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "client_id",
-									"value": "{{client_id}}",
-									"description": "The Client ID of the application requesting to revoke the\naccess token.",
-									"disabled": true
-								},
-								{
-									"key": "client_secret",
-									"value": "{{client_secret}}",
-									"description": "The client secret of the application requesting to revoke\nan access token.",
-									"disabled": true
-								},
-								{
-									"key": "token",
-									"value": "n22JPxrh18m4Y0wIZPIqYZK7VRrsMTWW",
-									"description": "The access token to revoke.",
-									"disabled": true
-								}
-							]
-						},
-						"url": "https://{{api.box.com}}/oauth2/revoke",
-						"description": "Revoke an active Access Token, effectively logging a user out\n\nhttps://developer.box.com/reference/post-oauth2-revoke"
-					},
-					"status": "OK",
-					"code": 200,
-					"_postman_previewlanguage": "Text",
-					"header": [],
-					"cookie": [],
-					"responseTime": null,
-					"body": null
 				}
 			]
 		}
