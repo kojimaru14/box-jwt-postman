@@ -478,7 +478,7 @@
 					"type": "oauth2",
 					"oauth2": {
 						"tokenType": "",
-						"accessToken": "",
+						"accessToken": "{{jwt_access_token}}",
 						"addTokenTo": "header"
 					}
 				},
