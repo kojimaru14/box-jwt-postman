@@ -1158,14 +1158,29 @@
 	],
 	"variable": [
 		{
-			"id": "9139e3a7-4ed6-4ece-b99d-64f801c3d359",
+			"id": "fd780261-92d9-43cb-b9f3-478eb923e999",
 			"key": "config_json",
 			"value": "{\n  \"boxAppSettings\": {\n    \"clientID\": \"\",\n    \"clientSecret\": \"\",\n    \"appAuth\": {\n      \"publicKeyID\": \"\",\n      \"privateKey\": \"\",\n      \"passphrase\": \"\"\n    }\n  },\n  \"enterpriseID\": \"\"\n}",
 			"type": "string"
 		},
 		{
-			"id": "907933eb-26b2-47e1-812d-f08ca44900bc",
+			"id": "569e97a9-eb95-47dd-a87e-3e617ed17c6f",
 			"key": "jsrsasign_js",
+			"value": ""
+		},
+		{
+			"id": "0132ac16-449b-4777-809a-86369a87f17b",
+			"key": "jwt_assertion",
+			"value": ""
+		},
+		{
+			"id": "48d267f4-c461-4afa-b14a-9b116ca1af08",
+			"key": "jwt_client_id",
+			"value": ""
+		},
+		{
+			"id": "ce070440-0221-457d-ad4f-d8022a51ff79",
+			"key": "jwt_client_secret",
 			"value": ""
 		}
 	]
