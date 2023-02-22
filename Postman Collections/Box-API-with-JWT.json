@@ -12,10 +12,10 @@
 					"listen": "test",
 					"script": {
 						"id": "b96fbc6c-da08-4433-a515-c071eca2090c",
-						"type": "text/javascript",
 						"exec": [
-							"postman.setGlobalVariable(\"jsrsasign_js\", responseBody);"
-						]
+							"pm.collectionVariables.set(\"jsrsasign_js\", responseBody);"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -1158,13 +1158,13 @@
 	],
 	"variable": [
 		{
-			"id": "0b10f04a-e8c6-4a1f-96f8-0d02233d1070",
+			"id": "976a04df-3728-4580-bb09-b092674c0eea",
 			"key": "config_json",
 			"value": "{\n  \"boxAppSettings\": {\n    \"clientID\": \"\",\n    \"clientSecret\": \"\",\n    \"appAuth\": {\n      \"publicKeyID\": \"\",\n      \"privateKey\": \"\",\n      \"passphrase\": \"\"\n    }\n  },\n  \"enterpriseID\": \"\"\n}",
 			"type": "string"
 		},
 		{
-			"id": "fa447eb8-d50f-4cd8-ae37-bb076216b19f",
+			"id": "264f8342-2471-4509-98e2-f6d4bbba3548",
 			"key": "jsrsasign_js",
 			"value": ""
 		}
