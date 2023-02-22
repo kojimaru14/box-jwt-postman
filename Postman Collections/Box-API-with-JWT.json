@@ -263,7 +263,7 @@
 							"  })",
 							"} else {",
 							"  // if you are here, that means either client_id, client secret or JWT assertion is missing/incorrect.",
-							"  throw new Error('Something is wrong with the env variable \"config_json\". Please make sure you have the right configuration defined as global environment variable \"config_json\".')",
+							"  throw new Error('Something is wrong with the env variable \"config_json\". Please make sure you have the right configuration defined as \"config_json\" in Collection Variable.')",
 							"}"
 						],
 						"type": "text/javascript"
@@ -1158,23 +1158,23 @@
 	],
 	"variable": [
 		{
-			"id": "093b95a4-a2ec-48bc-8594-3e34aef75f48",
+			"id": "3574f584-de3a-4888-8d1e-1a56f91d6133",
 			"key": "config_json",
 			"value": "{\n  \"boxAppSettings\": {\n    \"clientID\": \"\",\n    \"clientSecret\": \"\",\n    \"appAuth\": {\n      \"publicKeyID\": \"\",\n      \"privateKey\": \"\",\n      \"passphrase\": \"\"\n    }\n  },\n  \"enterpriseID\": \"\"\n}",
 			"type": "string"
 		},
 		{
-			"id": "c50d0ddd-1169-468d-8ebc-bf08b75e51cc",
+			"id": "b92b6332-1e90-4645-8992-66beb0860d42",
 			"key": "jsrsasign_js",
 			"value": ""
 		},
 		{
-			"id": "d764370b-55aa-4774-bb47-ed0060e104d2",
+			"id": "d710fb42-3f80-454e-bac3-3699cd43f563",
 			"key": "jwt_expires_at",
 			"value": ""
 		},
 		{
-			"id": "6ee1ba4a-29ac-4bfd-b794-7ef7fe7509ba",
+			"id": "ff08ac51-2bbd-4784-9e07-fbf94aa5677b",
 			"key": "jwt_access_token",
 			"value": ""
 		}
