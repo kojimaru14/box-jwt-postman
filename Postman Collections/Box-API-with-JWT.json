@@ -366,9 +366,9 @@
 					"script": {
 						"id": "02ac6508-47fc-499b-a787-6569043786e1",
 						"exec": [
-							"// Determine if the Access Token has expired",
-							"const expiresAt = pm.globals.get('jwt_expires_at')",
-							"const accessToken = pm.globals.get('jwt_access_token')",
+							"// determine if the Access Token has expired",
+							"const expiresAt = pm.collectionVariables.get('jwt_expires_at')",
+							"const accessToken = pm.collectionVariables.get('jwt_access_token')",
 							"const expired = Date.now() > Number(expiresAt)",
 							"",
 							"// If token is present and is not expired, then we immediately exit and move on to making the call",
@@ -379,9 +379,9 @@
 							"// Load the jsrsasign library into Postman Sandbox",
 							"const navigator = {};   //fake a navigator object for the lib",
 							"const window = {};      //fake a window object for the lib",
-							"eval(pm.globals.get(\"jsrsasign_js\"));   //import javascript jsrsasign",
+							"eval(pm.collectionVariables.get(\"jsrsasign_js\"));   //import javascript jsrsasign",
 							"",
-							"const envConfig = pm.globals.get('config_json')",
+							"const envConfig = pm.collectionVariables.get('config_json')",
 							"const config = JSON.parse(envConfig);",
 							"",
 							"// Generate random string for \"jti\" claim",
@@ -459,13 +459,13 @@
 							"      // determine when this token is set to expire at",
 							"      const newExpiresAt = Date.now() + data.expires_in * 1000",
 							"      // store the new variables in the environment",
-							"      pm.globals.set('jwt_access_token', data.access_token)",
-							"      pm.globals.set('jwt_expires_at', newExpiresAt)",
+							"      pm.collectionVariables.set('jwt_access_token', data.access_token)",
+							"      pm.collectionVariables.set('jwt_expires_at', newExpiresAt)",
 							"    }",
 							"  })",
 							"} else {",
 							"  // if you are here, that means either client_id, client secret or JWT assertion is missing/incorrect.",
-							"  throw new Error('Something is wrong with the env variable \"config_json\". Please make sure you have the right configuration defined as global environment variable \"config_json\".')",
+							"  throw new Error('Something is wrong with the env variable \"config_json\". Please make sure you have the right configuration defined as \"config_json\" in Collection Variable.')",
 							"}"
 						],
 						"type": "text/javascript"
@@ -1158,23 +1158,23 @@
 	],
 	"variable": [
 		{
-			"id": "54145fa9-04f1-4066-ba88-5105a507006a",
+			"id": "f37deff8-7b78-4e42-8a81-8ae86e2864d0",
 			"key": "config_json",
 			"value": "{\n  \"boxAppSettings\": {\n    \"clientID\": \"\",\n    \"clientSecret\": \"\",\n    \"appAuth\": {\n      \"publicKeyID\": \"\",\n      \"privateKey\": \"\",\n      \"passphrase\": \"\"\n    }\n  },\n  \"enterpriseID\": \"\"\n}",
 			"type": "string"
 		},
 		{
-			"id": "48fb79fb-0d14-4f8f-8f27-560cac0355ae",
+			"id": "6e947932-eab5-4a28-a5b1-15e98ac88d7e",
 			"key": "jsrsasign_js",
 			"value": ""
 		},
 		{
-			"id": "a0ed5533-313c-4ea5-bce3-a93bf3268318",
+			"id": "3f4b2a14-7de5-436f-b566-7e26c159fd38",
 			"key": "jwt_access_token",
 			"value": ""
 		},
 		{
-			"id": "91183483-2eed-4cbe-9edb-642277decefb",
+			"id": "3b835219-ef86-4e93-8c24-16da7e1dd9f6",
 			"key": "jwt_expires_at",
 			"value": ""
 		}
