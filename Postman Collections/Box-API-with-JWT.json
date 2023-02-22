@@ -165,8 +165,8 @@
 						"id": "7e6a19d0-7542-4c19-b942-fbbb1639e70f",
 						"exec": [
 							"// determine if the Access Token has expired",
-							"const expiresAt = pm.globals.get('jwt_expires_at')",
-							"const accessToken = pm.globals.get('jwt_access_token')",
+							"const expiresAt = pm.collectionVariables.get('jwt_expires_at')",
+							"const accessToken = pm.collectionVariables.get('jwt_access_token')",
 							"const expired = Date.now() > Number(expiresAt)",
 							"",
 							"// If token is present and is not expired, then we immediately exit and move on to making the call",
@@ -177,9 +177,9 @@
 							"// Load the jsrsasign library into Postman Sandbox",
 							"const navigator = {};   //fake a navigator object for the lib",
 							"const window = {};      //fake a window object for the lib",
-							"eval(pm.globals.get(\"jsrsasign_js\"));   //import javascript jsrsasign",
+							"eval(pm.collectionVariables.get(\"jsrsasign_js\"));   //import javascript jsrsasign",
 							"",
-							"const envConfig = pm.globals.get('config_json')",
+							"const envConfig = pm.collectionVariables.get('config_json')",
 							"const config = JSON.parse(envConfig);",
 							"",
 							"// Generate random string for \"jti\" claim",
@@ -257,8 +257,8 @@
 							"      // determine when this token is set to expire at",
 							"      const newExpiresAt = Date.now() + data.expires_in * 1000",
 							"      // store the new variables in the environment",
-							"      pm.globals.set('jwt_access_token', data.access_token)",
-							"      pm.globals.set('jwt_expires_at', newExpiresAt)",
+							"      pm.collectionVariables.set('jwt_access_token', data.access_token)",
+							"      pm.collectionVariables.set('jwt_expires_at', newExpiresAt)",
 							"    }",
 							"  })",
 							"} else {",
@@ -1158,23 +1158,23 @@
 	],
 	"variable": [
 		{
-			"id": "e67c9903-d2ec-4946-b251-35de05e8e8f1",
+			"id": "49324bc8-d7ff-4c26-a70b-2672e26d95a6",
 			"key": "config_json",
 			"value": "{\n  \"boxAppSettings\": {\n    \"clientID\": \"\",\n    \"clientSecret\": \"\",\n    \"appAuth\": {\n      \"publicKeyID\": \"\",\n      \"privateKey\": \"\",\n      \"passphrase\": \"\"\n    }\n  },\n  \"enterpriseID\": \"\"\n}",
 			"type": "string"
 		},
 		{
-			"id": "64d2fe99-881e-48b8-b47b-3eb2f3557ab8",
+			"id": "19988700-813e-4b01-8b6b-3e561774aa8b",
 			"key": "jsrsasign_js",
 			"value": ""
 		},
 		{
-			"id": "5c03b4eb-b2f8-4b08-b11e-cecf5eed6b9a",
+			"id": "f195225a-a5cf-4191-9bd9-d69ce176c98c",
 			"key": "jwt_access_token",
 			"value": ""
 		},
 		{
-			"id": "133c75b3-7b4c-4db5-afbd-739c4cc50671",
+			"id": "88a48843-756d-4029-9d3c-e3b708b66360",
 			"key": "jwt_expires_at",
 			"value": ""
 		}
