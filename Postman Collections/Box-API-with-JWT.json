@@ -1158,10 +1158,15 @@
 	],
 	"variable": [
 		{
-			"id": "e9925c80-df92-4dc3-89b8-4fbbe8c1cf45",
+			"id": "0b10f04a-e8c6-4a1f-96f8-0d02233d1070",
 			"key": "config_json",
 			"value": "{\n  \"boxAppSettings\": {\n    \"clientID\": \"\",\n    \"clientSecret\": \"\",\n    \"appAuth\": {\n      \"publicKeyID\": \"\",\n      \"privateKey\": \"\",\n      \"passphrase\": \"\"\n    }\n  },\n  \"enterpriseID\": \"\"\n}",
 			"type": "string"
+		},
+		{
+			"id": "fa447eb8-d50f-4cd8-ae37-bb076216b19f",
+			"key": "jsrsasign_js",
+			"value": ""
 		}
 	]
 }
