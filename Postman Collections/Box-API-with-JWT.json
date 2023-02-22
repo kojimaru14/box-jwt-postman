@@ -44,13 +44,13 @@
 							"const newExpiresAt = Date.now() + jsonData.expires_in * 1000\r",
 							"\r",
 							"// Store the new variables in the environment\r",
-							"postman.setGlobalVariable(\"jwt_access_token\", jsonData.access_token);\r",
-							"postman.setGlobalVariable(\"jwt_expires_at\", newExpiresAt);\r",
+							"pm.collectionVariables.set(\"jwt_access_token\", jsonData.access_token);\r",
+							"pm.collectionVariables.set(\"jwt_expires_at\", newExpiresAt);\r",
 							"\r",
 							"// (Optional) Clear the env variables as we don't need those after fetching the token\r",
-							"postman.clearGlobalVariable(\"jwt_assertion\");\r",
-							"postman.clearGlobalVariable(\"jwt_client_id\");\r",
-							"postman.clearGlobalVariable(\"jwt_client_secret\");"
+							"pm.collectionVariables.unset(\"jwt_assertion\");\r",
+							"pm.collectionVariables.unset(\"jwt_client_id\");\r",
+							"pm.collectionVariables.unset(\"jwt_client_secret\");"
 						],
 						"type": "text/javascript"
 					}
@@ -63,9 +63,9 @@
 							"// Load the jsrsasign library into Postman Sandbox\r",
 							"const navigator = {};   //fake a navigator object for the lib\r",
 							"const window = {};      //fake a window object for the lib\r",
-							"eval(pm.globals.get(\"jsrsasign_js\"));   //import javascript jsrsasign\r",
+							"eval(pm.collectionVariables.get(\"jsrsasign_js\"));   //import javascript jsrsasign\r",
 							"\r",
-							"const envConfig = pm.globals.get('config_json')\r",
+							"const envConfig = pm.collectionVariables.get('config_json')\r",
 							"const config = JSON.parse(envConfig);\r",
 							"\r",
 							"// Generate random string for \"jti\" claim\r",
@@ -109,9 +109,9 @@
 							"const sJWT = KJUR.jws.JWS.sign(header.alg, sHeader, sPayload, prvKey);\r",
 							"\r",
 							"// Set as env variables (these will be cleared after the call in post-script \"Tests\" phase)\r",
-							"pm.globals.set(\"jwt_assertion\", sJWT);\r",
-							"pm.globals.set(\"jwt_client_id\", config.boxAppSettings.clientID);\r",
-							"pm.globals.set(\"jwt_client_secret\", config.boxAppSettings.clientSecret);"
+							"pm.collectionVariables.set(\"jwt_assertion\", sJWT);\r",
+							"pm.collectionVariables.set(\"jwt_client_id\", config.boxAppSettings.clientID);\r",
+							"pm.collectionVariables.set(\"jwt_client_secret\", config.boxAppSettings.clientSecret);"
 						],
 						"type": "text/javascript"
 					}
@@ -1158,13 +1158,13 @@
 	],
 	"variable": [
 		{
-			"id": "976a04df-3728-4580-bb09-b092674c0eea",
+			"id": "9139e3a7-4ed6-4ece-b99d-64f801c3d359",
 			"key": "config_json",
 			"value": "{\n  \"boxAppSettings\": {\n    \"clientID\": \"\",\n    \"clientSecret\": \"\",\n    \"appAuth\": {\n      \"publicKeyID\": \"\",\n      \"privateKey\": \"\",\n      \"passphrase\": \"\"\n    }\n  },\n  \"enterpriseID\": \"\"\n}",
 			"type": "string"
 		},
 		{
-			"id": "264f8342-2471-4509-98e2-f6d4bbba3548",
+			"id": "907933eb-26b2-47e1-812d-f08ca44900bc",
 			"key": "jsrsasign_js",
 			"value": ""
 		}
