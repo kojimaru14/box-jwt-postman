@@ -1138,7 +1138,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "39a24452-8996-487a-b05a-ed475e4b8e92",
+				"id": "f77770c7-421d-4656-a254-98f8a4f7b640",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -1148,7 +1148,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "ca2a9a5e-896a-4e28-b9d8-b8e04f9b0ff6",
+				"id": "c8e1c969-2276-494c-9704-cae9418df04a",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -1158,23 +1158,18 @@
 	],
 	"variable": [
 		{
-			"id": "49324bc8-d7ff-4c26-a70b-2672e26d95a6",
+			"id": "7831650b-b57c-4eb9-9f6f-515cc0df39b0",
 			"key": "config_json",
 			"value": "{\n  \"boxAppSettings\": {\n    \"clientID\": \"\",\n    \"clientSecret\": \"\",\n    \"appAuth\": {\n      \"publicKeyID\": \"\",\n      \"privateKey\": \"\",\n      \"passphrase\": \"\"\n    }\n  },\n  \"enterpriseID\": \"\"\n}",
 			"type": "string"
 		},
 		{
-			"id": "19988700-813e-4b01-8b6b-3e561774aa8b",
+			"id": "7b5e5307-4cee-4ae8-9bc6-775ec4630328",
 			"key": "jsrsasign_js",
 			"value": ""
 		},
 		{
-			"id": "f195225a-a5cf-4191-9bd9-d69ce176c98c",
-			"key": "jwt_access_token",
-			"value": ""
-		},
-		{
-			"id": "88a48843-756d-4029-9d3c-e3b708b66360",
+			"id": "a247de92-578f-42bb-9dc0-f7a1b755056e",
 			"key": "jwt_expires_at",
 			"value": ""
 		}
